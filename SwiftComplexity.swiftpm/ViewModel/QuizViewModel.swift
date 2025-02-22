@@ -45,26 +45,22 @@ class QuizViewModel: ObservableObject {
     func checkAnswer(for sectionId: UUID, answer: String) {
           userAnswers[sectionId.uuidString] = answer
           
-          if let section = currentQuestion.sections.first(where: { section in
-              section.id.uuidString == sectionId.uuidString
-          }) {
-              let isCorrect = answer == section.complexity
-              if isCorrect {
-                  score += 1
-                  feedback = FeedbackState(
-                      isCorrect: true,
-                      message: "Correct! Well done!",
-                      explanation: section.explanation,
-                      correctAnswer: section.complexity
-                  )
-              } else {
-                  feedback = FeedbackState(
-                      isCorrect: false,
-                      message: "Not quite right",
-                      explanation: section.explanation,
-                      correctAnswer: section.complexity
-                  )
-              }
+          let isCorrect = answer == currentQuestion.expectedComplexity
+          if isCorrect {
+              score += 1
+              feedback = FeedbackState(
+                  isCorrect: true,
+                  message: "Correct! Well done!",
+                  explanation: currentQuestion.explanation,
+                  correctAnswer: currentQuestion.expectedComplexity
+              )
+          } else {
+              feedback = FeedbackState(
+                  isCorrect: false,
+                  message: "Not quite right",
+                  explanation: currentQuestion.explanation,
+                  correctAnswer: currentQuestion.expectedComplexity
+              )
           }
           
           checkQuestionCompletion()
