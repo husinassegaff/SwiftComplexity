@@ -60,7 +60,7 @@ class QuizViewModel: ObservableObject {
               } else {
                   feedback = FeedbackState(
                       isCorrect: false,
-                      message: "Not quite right. Let's understand why:",
+                      message: "Not quite right",
                       explanation: section.explanation,
                       correctAnswer: section.complexity
                   )

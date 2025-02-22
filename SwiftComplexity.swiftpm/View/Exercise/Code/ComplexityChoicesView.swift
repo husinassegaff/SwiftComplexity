@@ -24,12 +24,26 @@ struct ComplexityChoicesView: View {
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
-            }
-        
-            if let feedback = viewModel.feedback {
-                FeedbackView(feedback: feedback)
+                .disabled(viewModel.feedback != nil)
             }
             
+            if let feedback = viewModel.feedback {
+                FeedbackView(feedback: feedback, question: viewModel.currentQuestion)
+                
+                if !viewModel.isLastQuestion {
+                    Button {
+                        viewModel.moveToNextQuestion()
+                    } label: {
+                        Text("Next Question")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                    .padding(.top)
+                }
+            }
         }
         .padding()
     }
