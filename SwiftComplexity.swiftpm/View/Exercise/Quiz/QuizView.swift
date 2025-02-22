@@ -3,7 +3,8 @@ import SwiftUI
 struct QuizView: View {
     let difficulty: Difficulty
     @StateObject private var viewModel: QuizViewModel
-    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var navigationManager: NavigationManager
+    @State private var showExitAlert = false
     
     init(difficulty: Difficulty) {
         self.difficulty = difficulty
@@ -18,23 +19,17 @@ struct QuizView: View {
             
             ScrollView {
                 VStack(spacing: 20) {
-        
                     QuestionHeaderView(question: viewModel.currentQuestion)
                     
                     HStack(spacing: 20) {
-        
                         VStack {
-            
                             CodeSnippetView(code: viewModel.currentQuestion.codeSnippet)
-                            
-                        
                             ComplexityChoicesView(viewModel: viewModel)
                         }
                         .frame(maxWidth: .infinity)
                         .background(Color(.systemGray6))
                         .cornerRadius(12)
                         
-        
                         DrawingCanvasView()
                             .frame(maxWidth: .infinity)
                     }
@@ -42,21 +37,40 @@ struct QuizView: View {
                 .padding()
             }
         }
+        .navigationTitle("\(difficulty.rawValue) Level")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button("Exit") {
-                    dismiss()
+                    showExitAlert = true
                 }
             }
             
             ToolbarItem(placement: .navigationBarTrailing) {
-                Text("Question \(viewModel.currentQuestionIndex + 1)/\(viewModel.questionCount)")
-                    .foregroundColor(.secondary)
+                HStack(spacing: 12) {
+                    Text("Score: \(viewModel.score)")
+                        .foregroundColor(.secondary)
+                    Text("•")
+                        .foregroundColor(.secondary)
+                    Text("Question \(viewModel.currentQuestionIndex + 1)/\(viewModel.questionCount)")
+                        .foregroundColor(.secondary)
+                }
             }
+        }
+        .alert("Exit Quiz", isPresented: $showExitAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Exit", role: .destructive) {
+                navigationManager.navigateBack()
+            }
+        } message: {
+            Text("Your progress will not be saved. Are you sure you want to exit?")
         }
         .sheet(isPresented: $viewModel.showResult) {
             QuizResultView(viewModel: viewModel)
+                .onDisappear {
+                    navigationManager.popToRoot()
+                }
         }
     }
     
