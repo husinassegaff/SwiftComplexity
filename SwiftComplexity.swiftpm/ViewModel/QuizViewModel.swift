@@ -80,7 +80,7 @@ class QuizViewModel: ObservableObject {
         userAnswers[sectionId.uuidString] = answer
         
         let isCorrect = answer == currentQuestion.expectedComplexity
-        if isCorrect {
+        if isCorrect && !userAnswers.values.contains(answer) {
             score += 1
             feedback = FeedbackState(
                 isCorrect: true,
@@ -99,7 +99,7 @@ class QuizViewModel: ObservableObject {
         
         if isLastQuestion {
             Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 second delay
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
                 completeQuiz()
             }
         } else {
@@ -107,11 +107,11 @@ class QuizViewModel: ObservableObject {
         }
     }
     
-    func moveToNextQuestion() {
+    func completeQuiz() {
         withAnimation {
-            currentQuestionIndex += 1
-            selectedComplexity = nil
-            feedback = nil
+            stopTimer()
+            isQuizCompleted = true
+            showResult = true
         }
     }
     
@@ -129,11 +129,11 @@ class QuizViewModel: ObservableObject {
         }
     }
     
-    func completeQuiz() {
+    func moveToNextQuestion() {
         withAnimation {
-            stopTimer()
-            isQuizCompleted = true
-            showResult = true
+            currentQuestionIndex += 1
+            selectedComplexity = nil
+            feedback = nil
         }
     }
     
@@ -146,7 +146,7 @@ class QuizViewModel: ObservableObject {
     }
     
     func calculateFinalScore() -> (score: Int, total: Int, percentage: Double) {
-        let totalPossiblePoints = questions.reduce(0) { $0 + $1.sections.count }
+        let totalPossiblePoints = questions.count
         let percentage = (Double(score) / Double(totalPossiblePoints)) * 100
         return (score, totalPossiblePoints, percentage)
     }

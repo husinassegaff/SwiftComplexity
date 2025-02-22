@@ -5,6 +5,7 @@ struct QuizView: View {
     @StateObject private var viewModel: QuizViewModel
     @EnvironmentObject private var navigationManager: NavigationManager
     @State private var showExitAlert = false
+    @State private var showQuizResult = false
     
     init(difficulty: Difficulty) {
         self.difficulty = difficulty
@@ -21,6 +22,40 @@ struct QuizView: View {
             ProgressView(value: viewModel.progress)
                 .tint(difficultyColor)
                 .padding()
+            
+            if viewModel.isQuizCompleted {
+                HStack(spacing: 16) {
+                    Button(action: {
+                        viewModel.restartQuiz()
+                    }) {
+                        HStack {
+                            Image(systemName: "arrow.counterclockwise")
+                            Text("Try Again")
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+                    
+                    Button(action: {
+                        // Simpan data dan kembali
+                        navigationManager.navigateBack()
+                    }) {
+                        HStack {
+                            Image(systemName: "square.and.arrow.down")
+                            Text("Save & Exit")
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+                }
+                .padding()
+            }
             
             ScrollView {
                 VStack(spacing: 20) {
@@ -71,9 +106,7 @@ struct QuizView: View {
         } message: {
             Text("Your progress will not be saved. Are you sure you want to exit?")
         }
-        .sheet(isPresented: $viewModel.showResult, onDismiss: {
-            navigationManager.popToRoot()
-        }) {
+        .sheet(isPresented: $viewModel.showResult) {
             QuizResultView(viewModel: viewModel)
         }
     }

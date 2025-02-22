@@ -22,15 +22,16 @@ struct QuizResultView: View {
                 Text("Time: \(viewModel.formattedTime)")
                     .font(.title3)
                     .foregroundColor(.secondary)
-                
-                Button("Back To Select Quiz") {
-                    dismiss()
-                }
-                .buttonStyle(.borderedProminent)
-                .padding(.top)
             }
             .padding()
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Close") {
+                        dismiss()
+                    }
+                }
+            }
         }
     }
 }
