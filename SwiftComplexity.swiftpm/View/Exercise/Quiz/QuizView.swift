@@ -40,7 +40,6 @@ struct QuizView: View {
                     }
                     
                     Button(action: {
-                        // Simpan data dan kembali
                         navigationManager.navigateBack()
                     }) {
                         HStack {

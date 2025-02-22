@@ -4,7 +4,6 @@ import SwiftUI
 @MainActor
 class QuizViewModel: ObservableObject {
     @Published var currentQuestionIndex = 0
-    @Published var userAnswers: [String: String] = [:]
     @Published var showResult = false
     @Published var score = 0
     @Published var isQuizCompleted = false
@@ -16,6 +15,7 @@ class QuizViewModel: ObservableObject {
     private var startTime: Date?
     private let difficulty: Difficulty
     private var questions: [QuizQuestion]
+    private var answeredCorrectly: Set<Int> = []
     
     var questionCount: Int {
         questions.count
@@ -77,33 +77,33 @@ class QuizViewModel: ObservableObject {
     }
     
     func checkAnswer(for sectionId: UUID, answer: String) {
-        userAnswers[sectionId.uuidString] = answer
-        
         let isCorrect = answer == currentQuestion.expectedComplexity
-        if isCorrect && !userAnswers.values.contains(answer) {
+        
+        if isCorrect && !answeredCorrectly.contains(currentQuestionIndex) {
             score += 1
-            feedback = FeedbackState(
-                isCorrect: true,
-                message: "Correct! Well done!",
-                explanation: currentQuestion.explanation,
-                correctAnswer: currentQuestion.expectedComplexity
-            )
-        } else {
-            feedback = FeedbackState(
-                isCorrect: false,
-                message: "Not quite right",
-                explanation: currentQuestion.explanation,
-                correctAnswer: currentQuestion.expectedComplexity
-            )
+            answeredCorrectly.insert(currentQuestionIndex)
         }
         
+        feedback = FeedbackState(
+            isCorrect: isCorrect,
+            message: isCorrect ? "Correct! Well done!" : "Not quite right",
+            explanation: currentQuestion.explanation,
+            correctAnswer: currentQuestion.expectedComplexity
+        )
+
         if isLastQuestion {
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 1_500_000_000)
                 completeQuiz()
             }
-        } else {
-            checkQuestionCompletion()
+        }
+    }
+
+    func moveToNextQuestion() {
+        withAnimation {
+            currentQuestionIndex += 1
+            selectedComplexity = nil
+            feedback = nil
         }
     }
     
@@ -118,7 +118,7 @@ class QuizViewModel: ObservableObject {
     func restartQuiz() {
         withAnimation {
             currentQuestionIndex = 0
-            userAnswers.removeAll()
+            answeredCorrectly.removeAll()
             score = 0
             isQuizCompleted = false
             selectedComplexity = nil
@@ -129,40 +129,10 @@ class QuizViewModel: ObservableObject {
         }
     }
     
-    func moveToNextQuestion() {
-        withAnimation {
-            currentQuestionIndex += 1
-            selectedComplexity = nil
-            feedback = nil
-        }
-    }
-    
-    func hasAnswered(sectionId: UUID) -> Bool {
-        userAnswers[sectionId.uuidString] != nil
-    }
-    
-    func getAnswer(for sectionId: UUID) -> String? {
-        userAnswers[sectionId.uuidString]
-    }
-    
     func calculateFinalScore() -> (score: Int, total: Int, percentage: Double) {
         let totalPossiblePoints = questions.count
         let percentage = (Double(score) / Double(totalPossiblePoints)) * 100
         return (score, totalPossiblePoints, percentage)
-    }
-    
-    private func checkQuestionCompletion() {
-        let answeredSections = currentQuestion.sections.filter { section in
-            userAnswers[section.id.uuidString] != nil
-        }
-        
-        if answeredSections.count == currentQuestion.sections.count {
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 2_000_000_000)
-                feedback = nil
-                moveToNextQuestion()
-            }
-        }
     }
     
     deinit {
