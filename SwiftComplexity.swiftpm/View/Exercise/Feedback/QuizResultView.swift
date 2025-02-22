@@ -19,6 +19,10 @@ struct QuizResultView: View {
                     .font(.system(size: 48, weight: .bold))
                     .foregroundColor(score.percentage >= 70 ? .green : .orange)
                 
+                Text("Time: \(viewModel.formattedTime)")
+                    .font(.title3)
+                    .foregroundColor(.secondary)
+                
                 Button("Try Again") {
                     viewModel.restartQuiz()
                     dismiss()

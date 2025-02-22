@@ -13,6 +13,11 @@ struct QuizView: View {
     
     var body: some View {
         VStack(spacing: 0) {
+            Text(viewModel.formattedTime)
+                .font(.system(.title3, design: .monospaced))
+                .foregroundColor(.secondary)
+                .padding(.vertical, 8)
+            
             ProgressView(value: viewModel.progress)
                 .tint(difficultyColor)
                 .padding()

@@ -16,14 +16,13 @@ struct FeedbackView: View {
             .foregroundColor(feedback.isCorrect ? .green : .red)
             
             HStack {
-                Text("Expected: \(feedback.correctAnswer)")
-                    .foregroundColor(.secondary)
                 Spacer()
                 Button {
                     showDetailedFeedback = true
                 } label: {
                     Label("View Analysis", systemImage: "chart.bar.doc.horizontal")
                 }
+                Spacer()
             }
         }
         .padding()

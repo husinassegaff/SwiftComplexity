@@ -1,4 +1,5 @@
 import SwiftUI
+@preconcurrency import Combine
 
 @MainActor
 class QuizViewModel: ObservableObject {
@@ -9,13 +10,16 @@ class QuizViewModel: ObservableObject {
     @Published var isQuizCompleted = false
     @Published var selectedComplexity: String?
     @Published var feedback: FeedbackState?
+    @Published var elapsedTime: TimeInterval = 0
     
+    private var timerCancellable: AnyCancellable?
+    private var startTime: Date?
     private let difficulty: Difficulty
     private var questions: [QuizQuestion]
     
     var questionCount: Int {
-           questions.count
-       }
+        questions.count
+    }
     
     var currentQuestion: QuizQuestion {
         questions[currentQuestionIndex]
@@ -29,6 +33,18 @@ class QuizViewModel: ObservableObject {
         currentQuestionIndex == questions.count - 1
     }
     
+    var formattedTime: String {
+        let hours = Int(elapsedTime) / 3600
+        let minutes = Int(elapsedTime) / 60 % 60
+        let seconds = Int(elapsedTime) % 60
+        
+        if hours > 0 {
+            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            return String(format: "%02d:%02d", minutes, seconds)
+        }
+    }
+    
     init(difficulty: Difficulty) {
         self.difficulty = difficulty
         
@@ -40,31 +56,49 @@ class QuizViewModel: ObservableObject {
         case .hard:
             self.questions = hardQuestions
         }
+        
+        startTimer()
+    }
+    
+    private func startTimer() {
+        startTime = Date()
+        timerCancellable = Timer.publish(every: 1, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self = self,
+                      let startTime = self.startTime else { return }
+                self.elapsedTime = Date().timeIntervalSince(startTime)
+            }
+    }
+    
+    private func stopTimer() {
+        timerCancellable?.cancel()
+        timerCancellable = nil
     }
     
     func checkAnswer(for sectionId: UUID, answer: String) {
-          userAnswers[sectionId.uuidString] = answer
-          
-          let isCorrect = answer == currentQuestion.expectedComplexity
-          if isCorrect {
-              score += 1
-              feedback = FeedbackState(
-                  isCorrect: true,
-                  message: "Correct! Well done!",
-                  explanation: currentQuestion.explanation,
-                  correctAnswer: currentQuestion.expectedComplexity
-              )
-          } else {
-              feedback = FeedbackState(
-                  isCorrect: false,
-                  message: "Not quite right",
-                  explanation: currentQuestion.explanation,
-                  correctAnswer: currentQuestion.expectedComplexity
-              )
-          }
-          
-          checkQuestionCompletion()
-      }
+        userAnswers[sectionId.uuidString] = answer
+        
+        let isCorrect = answer == currentQuestion.expectedComplexity
+        if isCorrect {
+            score += 1
+            feedback = FeedbackState(
+                isCorrect: true,
+                message: "Correct! Well done!",
+                explanation: currentQuestion.explanation,
+                correctAnswer: currentQuestion.expectedComplexity
+            )
+        } else {
+            feedback = FeedbackState(
+                isCorrect: false,
+                message: "Not quite right",
+                explanation: currentQuestion.explanation,
+                correctAnswer: currentQuestion.expectedComplexity
+            )
+        }
+        
+        checkQuestionCompletion()
+    }
     
     func moveToNextQuestion() {
         withAnimation {
@@ -82,11 +116,15 @@ class QuizViewModel: ObservableObject {
             isQuizCompleted = false
             selectedComplexity = nil
             feedback = nil
+            stopTimer()
+            elapsedTime = 0
+            startTimer()
         }
     }
     
     func completeQuiz() {
         withAnimation {
+            stopTimer()
             isQuizCompleted = true
             showResult = true
         }
@@ -106,7 +144,6 @@ class QuizViewModel: ObservableObject {
         return (score, totalPossiblePoints, percentage)
     }
     
-    
     private func checkQuestionCompletion() {
         let answeredSections = currentQuestion.sections.filter { section in
             userAnswers[section.id.uuidString] != nil
@@ -124,5 +161,12 @@ class QuizViewModel: ObservableObject {
             }
         }
     }
-
+    
+    deinit {
+        // Handle stopping timer in deinit safely
+        if let timerCancellable = timerCancellable {
+            timerCancellable.cancel()
+            self.timerCancellable = nil
+        }
+    }
 }
