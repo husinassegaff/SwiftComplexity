@@ -97,7 +97,14 @@ class QuizViewModel: ObservableObject {
             )
         }
         
-        checkQuestionCompletion()
+        if isLastQuestion {
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 second delay
+                completeQuiz()
+            }
+        } else {
+            checkQuestionCompletion()
+        }
     }
     
     func moveToNextQuestion() {
@@ -151,19 +158,14 @@ class QuizViewModel: ObservableObject {
         
         if answeredSections.count == currentQuestion.sections.count {
             Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 3_000_000_000)
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
                 feedback = nil
-                if isLastQuestion {
-                    completeQuiz()
-                } else {
-                    moveToNextQuestion()
-                }
+                moveToNextQuestion()
             }
         }
     }
     
     deinit {
-        // Handle stopping timer in deinit safely
         if let timerCancellable = timerCancellable {
             timerCancellable.cancel()
             self.timerCancellable = nil

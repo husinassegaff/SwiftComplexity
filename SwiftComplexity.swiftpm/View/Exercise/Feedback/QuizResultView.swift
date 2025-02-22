@@ -23,8 +23,7 @@ struct QuizResultView: View {
                     .font(.title3)
                     .foregroundColor(.secondary)
                 
-                Button("Try Again") {
-                    viewModel.restartQuiz()
+                Button("Back To Select Quiz") {
                     dismiss()
                 }
                 .buttonStyle(.borderedProminent)

@@ -71,11 +71,10 @@ struct QuizView: View {
         } message: {
             Text("Your progress will not be saved. Are you sure you want to exit?")
         }
-        .sheet(isPresented: $viewModel.showResult) {
+        .sheet(isPresented: $viewModel.showResult, onDismiss: {
+            navigationManager.popToRoot()
+        }) {
             QuizResultView(viewModel: viewModel)
-                .onDisappear {
-                    navigationManager.popToRoot()
-                }
         }
     }
     
