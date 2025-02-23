@@ -56,6 +56,27 @@ struct QuizView: View {
                 .padding()
             }
             
+            HStack {
+                Spacer()
+                
+                Button {
+                    viewModel.toggleHint()
+                } label: {
+                    Label("Hint", systemImage: "lightbulb")
+                        .padding()
+                        .background(Color.yellow.opacity(0.2))
+                        .foregroundColor(.orange)
+                        .cornerRadius(10)
+                }
+            }
+            .padding(.horizontal)
+            
+            if viewModel.showHint {
+                HintView(sections: viewModel.currentQuestion.sections)
+                    .padding()
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+            
             ScrollView {
                 VStack(spacing: 20) {
                     QuestionHeaderView(question: viewModel.currentQuestion)

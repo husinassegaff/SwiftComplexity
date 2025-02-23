@@ -10,12 +10,14 @@ class QuizViewModel: ObservableObject {
     @Published var selectedComplexity: String?
     @Published var feedback: FeedbackState?
     @Published var elapsedTime: TimeInterval = 0
+    @Published var showHint = false
     
     private var timerCancellable: AnyCancellable?
     private var startTime: Date?
     private let difficulty: Difficulty
     private var questions: [QuizQuestion]
     private var answeredCorrectly: Set<Int> = []
+    private var hintUsedForQuestions: Set<Int> = []
     
     var questionCount: Int {
         questions.count
@@ -104,6 +106,7 @@ class QuizViewModel: ObservableObject {
             currentQuestionIndex += 1
             selectedComplexity = nil
             feedback = nil
+            showHint = false
         }
     }
     
@@ -119,10 +122,12 @@ class QuizViewModel: ObservableObject {
         withAnimation {
             currentQuestionIndex = 0
             answeredCorrectly.removeAll()
+            hintUsedForQuestions.removeAll()
             score = 0
             isQuizCompleted = false
             selectedComplexity = nil
             feedback = nil
+            showHint = false
             stopTimer()
             elapsedTime = 0
             startTimer()
@@ -133,6 +138,23 @@ class QuizViewModel: ObservableObject {
         let totalPossiblePoints = questions.count
         let percentage = (Double(score) / Double(totalPossiblePoints)) * 100
         return (score, totalPossiblePoints, percentage)
+    }
+    
+    func toggleHint() {
+        showHint.toggle()
+        
+        if showHint && !hintUsedForQuestions.contains(currentQuestionIndex) {
+            hintUsedForQuestions.insert(currentQuestionIndex)
+            
+            switch difficulty {
+            case .easy:
+                elapsedTime += 10
+            case .medium:
+                elapsedTime += 15
+            case .hard:
+                elapsedTime += 25
+            }
+        }
     }
     
     deinit {
