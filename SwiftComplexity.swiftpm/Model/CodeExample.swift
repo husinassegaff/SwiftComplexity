@@ -1,10 +1,9 @@
 import SwiftUI
 
-struct CodeExample {
-    let id: UUID = UUID()
+struct CodeExample: Identifiable {
+    let id = UUID()
     let title: String
-    let description: String
-    let codeSnippet: String
     let complexity: String
-    let difficulty: Difficulty
+    let code: String
+    let explanation: String
 }
