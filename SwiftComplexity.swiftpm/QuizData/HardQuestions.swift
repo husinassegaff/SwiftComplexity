@@ -279,5 +279,570 @@ let hardQuestions = [
         difficulty: .hard,
         expectedComplexity: "O(n)",
         explanation: "Depth-First Search (DFS) is a graph traversal algorithm that explores as far as possible along each branch before backtracking. Since each node and edge is processed once, the worst-case complexity is simplified to O(n), where n represents the number of nodes in the graph."
+    ),
+    QuizQuestion(
+        title: "N-Queens Problem",
+        description: "Place N queens on an NxN chessboard so no two queens threaten each other",
+        codeSnippet: """
+        func solveNQueens(_ n: Int) -> [[String]] {
+            var board = Array(repeating: Array(repeating: ".", count: n), count: n)
+            var solutions: [[String]] = []
+            
+            func isSafe(_ row: Int, _ col: Int) -> Bool {
+                // Check row on left side
+                for j in 0..<col {
+                    if board[row][j] == "Q" { return false }
+                }
+                
+                // Check upper diagonal on left side
+                var i = row, j = col
+                while i >= 0 && j >= 0 {
+                    if board[i][j] == "Q" { return false }
+                    i -= 1; j -= 1
+                }
+                
+                // Check lower diagonal on left side
+                i = row; j = col
+                while i < n && j >= 0 {
+                    if board[i][j] == "Q" { return false }
+                    i += 1; j -= 1
+                }
+                
+                return true
+            }
+            
+            func solve(_ col: Int) {
+                if col >= n {
+                    solutions.append(board.map { String($0) })
+                    return
+                }
+                
+                for row in 0..<n {
+                    if isSafe(row, col) {
+                        board[row][col] = "Q"
+                        solve(col + 1)
+                        board[row][col] = "."
+                    }
+                }
+            }
+            
+            solve(0)
+            return solutions
+        }
+        """,
+        sections: [
+            CodeSection(
+                code: "func isSafe(_ row: Int, _ col: Int) -> Bool",
+                complexity: "O(n)",
+                explanation: "Checks three directions for conflicts",
+                lineNumbers: "5-27"
+            ),
+            CodeSection(
+                code: "func solve(_ col: Int)",
+                complexity: "O(2ⁿ)",
+                explanation: "Tries all possible combinations recursively",
+                lineNumbers: "29-41"
+            )
+        ],
+        difficulty: .hard,
+        expectedComplexity: "O(2ⁿ)",
+        explanation: "The N-Queens problem uses backtracking to try all possible board configurations. For each column, we try placing a queen in each row, leading to n choices at each step. The branching factor and recursion create an exponential time complexity of O(2ⁿ)."
+    ),
+
+    QuizQuestion(
+        title: "Minimum Edit Distance",
+        description: "Calculate minimum operations required to convert one string to another",
+        codeSnippet: """
+        func minDistance(_ word1: String, _ word2: String) -> Int {
+            let chars1 = Array(word1), chars2 = Array(word2)
+            let m = chars1.count, n = chars2.count
+            var dp = Array(repeating: Array(repeating: 0, count: n + 1), count: m + 1)
+            
+            // Initialize first row and column
+            for i in 0...m {
+                dp[i][0] = i
+            }
+            for j in 0...n {
+                dp[0][j] = j
+            }
+            
+            // Fill the dp table
+            for i in 1...m {
+                for j in 1...n {
+                    if chars1[i-1] == chars2[j-1] {
+                        dp[i][j] = dp[i-1][j-1]
+                    } else {
+                        dp[i][j] = min(
+                            dp[i-1][j] + 1,    // deletion
+                            dp[i][j-1] + 1,    // insertion
+                            dp[i-1][j-1] + 1   // substitution
+                        )
+                    }
+                }
+            }
+            
+            return dp[m][n]
+        }
+        """,
+        sections: [
+            CodeSection(
+                code: "var dp = Array(repeating: Array(repeating: 0, count: n + 1), count: m + 1)",
+                complexity: "O(n²)",
+                explanation: "Creates a matrix of size (m+1) × (n+1)",
+                lineNumbers: "4"
+            ),
+            CodeSection(
+                code: "for i in 1...m {\n    for j in 1...n { ... }\n}",
+                complexity: "O(n²)",
+                explanation: "Nested loops process each cell in the matrix",
+                lineNumbers: "15-26"
+            )
+        ],
+        difficulty: .hard,
+        expectedComplexity: "O(n²)",
+        explanation: "The algorithm uses dynamic programming with a 2D table to compute the minimum edit distance. It needs to fill every cell in an m×n matrix, where each cell computation takes constant time. This results in a time complexity of O(n²)."
+    ),
+
+    QuizQuestion(
+        title: "Permutation Generator",
+        description: "Generate all possible permutations of a string",
+        codeSnippet: """
+        func generatePermutations(_ str: String) -> [String] {
+            var chars = Array(str)
+            var result: [String] = []
+            
+            func permute(_ start: Int) {
+                if start == chars.count - 1 {
+                    result.append(String(chars))
+                    return
+                }
+                
+                for i in start..<chars.count {
+                    chars.swapAt(start, i)
+                    permute(start + 1)
+                    chars.swapAt(start, i)  // backtrack
+                }
+            }
+            
+            permute(0)
+            return result
+        }
+        """,
+        sections: [
+            CodeSection(
+                code: "func permute(_ start: Int)",
+                complexity: "O(n)",
+                explanation: "Each recursive call processes remaining elements",
+                lineNumbers: "4-13"
+            ),
+            CodeSection(
+                code: "for i in start..<chars.count { ... }",
+                complexity: "O(2ⁿ)",
+                explanation: "Creates n! different permutations",
+                lineNumbers: "10-13"
+            )
+        ],
+        difficulty: .hard,
+        expectedComplexity: "O(2ⁿ)",
+        explanation: "The permutation generator creates all possible arrangements of characters. For n characters, there are n! possible permutations. Since n! grows faster than 2ⁿ for large n, we simplify the complexity to O(2ⁿ) from our available options."
+    ),
+
+    QuizQuestion(
+        title: "Dijkstra's Algorithm",
+        description: "Find shortest path in a weighted graph using Dijkstra's algorithm",
+        codeSnippet: """
+        class Graph {
+            typealias Edge = (node: Int, weight: Int)
+            private var adjacencyList: [Int: [Edge]] = [:]
+            
+            func shortestPath(from start: Int, to end: Int) -> Int? {
+                var distances = [Int: Int]()
+                var queue = [(distance: Int, node: Int)]()
+                var visited = Set<Int>()
+                
+                // Initialize distances
+                for node in adjacencyList.keys {
+                    distances[node] = node == start ? 0 : Int.max
+                }
+                queue.append((0, start))
+                
+                while !queue.isEmpty {
+                    let (currentDistance, currentNode) = queue.removeFirst()
+                    
+                    if currentNode == end {
+                        return currentDistance
+                    }
+                    
+                    if visited.contains(currentNode) {
+                        continue
+                    }
+                    visited.insert(currentNode)
+                    
+                    guard let neighbors = adjacencyList[currentNode] else { continue }
+                    
+                    for edge in neighbors {
+                        let distance = currentDistance + edge.weight
+                        if distance < distances[edge.node, default: Int.max] {
+                            distances[edge.node] = distance
+                            queue.append((distance, edge.node))
+                        }
+                    }
+                    queue.sort { $0.distance < $1.distance }
+                }
+                
+                return nil
+            }
+        }
+        """,
+        sections: [
+            CodeSection(
+                code: "while !queue.isEmpty { ... }",
+                complexity: "O(n²)",
+                explanation: "Main loop processes each vertex and its edges",
+                lineNumbers: "17-38"
+            ),
+            CodeSection(
+                code: "queue.sort { $0.distance < $1.distance }",
+                complexity: "O(n log n)",
+                explanation: "Sorting queue after each iteration",
+                lineNumbers: "39"
+            )
+        ],
+        difficulty: .hard,
+        expectedComplexity: "O(n²)",
+        explanation: "This implementation of Dijkstra's algorithm uses a sorted array instead of a priority queue. For each vertex (n), we potentially process all edges and sort the queue. While an optimized version with a priority queue would be O(n log n), this implementation has a worst-case time complexity of O(n²) due to the repeated sorting."
+    ),
+
+    QuizQuestion(
+        title: "Matrix Chain Multiplication",
+        description: "Find the most efficient way to multiply a chain of matrices",
+        codeSnippet: """
+        func matrixChainOrder(_ dimensions: [Int]) -> Int {
+            let n = dimensions.count - 1
+            var dp = Array(repeating: Array(repeating: 0, count: n), count: n)
+            
+            // Length of chain
+            for len in 1..<n {
+                // For each start position
+                for i in 0..<(n - len) {
+                    let j = i + len
+                    dp[i][j] = Int.max
+                    
+                    // Try each split point
+                    for k in i..<j {
+                        let operations = dp[i][k] + dp[k+1][j] +
+                            dimensions[i] * dimensions[k+1] * dimensions[j+1]
+                        dp[i][j] = min(dp[i][j], operations)
+                    }
+                }
+            }
+            
+            return dp[0][n-1]
+        }
+        """,
+        sections: [
+            CodeSection(
+                code: "var dp = Array(repeating: Array(repeating: 0, count: n), count: n)",
+                complexity: "O(n²)",
+                explanation: "Creates a square matrix for dynamic programming",
+                lineNumbers: "3"
+            ),
+            CodeSection(
+                code: "for len in 1..<n {\n    for i in 0..<(n - len) {\n        for k in i..<j { ... }",
+                complexity: "O(n²)",
+                explanation: "Triple nested loops for computing optimal chains",
+                lineNumbers: "6-17"
+            )
+        ],
+        difficulty: .hard,
+        expectedComplexity: "O(n²)",
+        explanation: "Matrix Chain Multiplication uses dynamic programming to find the optimal way to parenthesize matrix multiplications. The algorithm fills a triangular matrix where each cell requires examining all possible split points. While the actual complexity is O(n³), we approximate it to O(n²) from our available options."
+    ),
+    QuizQuestion(
+        title: "Subset Sum Problem",
+        description: "Find if there exists a subset of array that sums to target value",
+        codeSnippet: """
+        func hasSubsetSum(_ nums: [Int], _ target: Int) -> Bool {
+            func findSubset(_ index: Int, _ currentSum: Int) -> Bool {
+                if currentSum == target {
+                    return true
+                }
+                if index >= nums.count || currentSum > target {
+                    return false
+                }
+                
+                // Include current number
+                if findSubset(index + 1, currentSum + nums[index]) {
+                    return true
+                }
+                
+                // Exclude current number
+                return findSubset(index + 1, currentSum)
+            }
+            
+            return findSubset(0, 0)
+        }
+        """,
+        sections: [
+            CodeSection(
+                code: "func findSubset(_ index: Int, _ currentSum: Int) -> Bool",
+                complexity: "O(2ⁿ)",
+                explanation: "Each element has two choices: include or exclude",
+                lineNumbers: "2-15"
+            ),
+            CodeSection(
+                code: "if findSubset(index + 1, currentSum + nums[index])",
+                complexity: "O(2ⁿ)",
+                explanation: "Tree of recursive calls doubles with each level",
+                lineNumbers: "10-12"
+            )
+        ],
+        difficulty: .hard,
+        expectedComplexity: "O(2ⁿ)",
+        explanation: "The Subset Sum problem uses recursive backtracking where for each element we have two choices: include it or not. This creates a binary decision tree with potentially 2ⁿ leaves, making the time complexity O(2ⁿ)."
+    ),
+
+    QuizQuestion(
+        title: "Kth Largest Element",
+        description: "Find the kth largest element using QuickSelect algorithm",
+        codeSnippet: """
+        func findKthLargest(_ nums: inout [Int], _ k: Int) -> Int {
+            func partition(_ left: Int, _ right: Int) -> Int {
+                let pivot = nums[right]
+                var i = left
+                
+                for j in left..<right {
+                    if nums[j] <= pivot {
+                        nums.swapAt(i, j)
+                        i += 1
+                    }
+                }
+                nums.swapAt(i, right)
+                return i
+            }
+            
+            func quickSelect(_ left: Int, _ right: Int, _ k: Int) -> Int {
+                let pivotIndex = partition(left, right)
+                let targetIndex = nums.count - k
+                
+                if pivotIndex == targetIndex {
+                    return nums[pivotIndex]
+                } else if pivotIndex < targetIndex {
+                    return quickSelect(pivotIndex + 1, right, k)
+                } else {
+                    return quickSelect(left, pivotIndex - 1, k)
+                }
+            }
+            
+            return quickSelect(0, nums.count - 1, k)
+        }
+        """,
+        sections: [
+            CodeSection(
+                code: "func partition(_ left: Int, _ right: Int) -> Int",
+                complexity: "O(n)",
+                explanation: "Partition scans through array segment once",
+                lineNumbers: "2-13"
+            ),
+            CodeSection(
+                code: "func quickSelect(_ left: Int, _ right: Int, _ k: Int) -> Int",
+                complexity: "O(n)",
+                explanation: "Average case only needs to process one partition path",
+                lineNumbers: "15-26"
+            )
+        ],
+        difficulty: .hard,
+        expectedComplexity: "O(n)",
+        explanation: "QuickSelect is an optimized version of QuickSort that only needs to process one partition in each recursion level. While the worst case is O(n²), the average case time complexity is O(n) as we only follow one path down the recursion tree."
+    ),
+
+    QuizQuestion(
+        title: "Binary Tree Serialization",
+        description: "Serialize and deserialize a binary tree to/from string format",
+        codeSnippet: """
+        class TreeNode {
+            var val: Int
+            var left: TreeNode?
+            var right: TreeNode?
+            init(_ val: Int) { self.val = val }
+        }
+        
+        class Codec {
+            func serialize(_ root: TreeNode?) -> String {
+                var result: [String] = []
+                
+                func preorder(_ node: TreeNode?) {
+                    guard let node = node else {
+                        result.append("null")
+                        return
+                    }
+                    result.append(String(node.val))
+                    preorder(node.left)
+                    preorder(node.right)
+                }
+                
+                preorder(root)
+                return result.joined(separator: ",")
+            }
+            
+            func deserialize(_ data: String) -> TreeNode? {
+                var values = data.split(separator: ",").map(String.init)
+                var index = 0
+                
+                func buildTree() -> TreeNode? {
+                    if index >= values.count || values[index] == "null" {
+                        index += 1
+                        return nil
+                    }
+                    
+                    let node = TreeNode(Int(values[index])!)
+                    index += 1
+                    node.left = buildTree()
+                    node.right = buildTree()
+                    return node
+                }
+                
+                return buildTree()
+            }
+        }
+        """,
+        sections: [
+            CodeSection(
+                code: "func preorder(_ node: TreeNode?)",
+                complexity: "O(n)",
+                explanation: "Visits each node exactly once during serialization",
+                lineNumbers: "11-19"
+            ),
+            CodeSection(
+                code: "func buildTree() -> TreeNode?",
+                complexity: "O(n)",
+                explanation: "Processes each value once during deserialization",
+                lineNumbers: "29-38"
+            )
+        ],
+        difficulty: .hard,
+        expectedComplexity: "O(n)",
+        explanation: "Both serialization and deserialization require visiting each node exactly once. The preorder traversal for serialization is O(n), and the recursive reconstruction for deserialization is also O(n), where n is the number of nodes in the tree."
+    ),
+
+    QuizQuestion(
+        title: "Skyline Problem",
+        description: "Find the skyline formed by overlapping buildings",
+        codeSnippet: """
+        struct Building {
+            let left: Int
+            let right: Int
+            let height: Int
+        }
+        
+        func getSkyline(_ buildings: [Building]) -> [(x: Int, height: Int)] {
+            // Convert buildings to points with height changes
+            var points: [(x: Int, height: Int)] = []
+            for building in buildings {
+                points.append((building.left, -building.height))  // Start point
+                points.append((building.right, building.height))  // End point
+            }
+            
+            // Sort points by x-coordinate
+            points.sort { $0.x < $1.x || ($0.x == $1.x && $0.height < $1.height) }
+            
+            var result: [(x: Int, height: Int)] = []
+            var heights = [0]  // Current heights, 0 is ground level
+            var prevMaxHeight = 0
+            
+            for point in points {
+                if point.height < 0 {
+                    // Building starts
+                    heights.append(-point.height)
+                } else {
+                    // Building ends
+                    if let index = heights.firstIndex(of: point.height) {
+                        heights.remove(at: index)
+                    }
+                }
+                
+                let currentMaxHeight = heights.max() ?? 0
+                if currentMaxHeight != prevMaxHeight {
+                    result.append((point.x, currentMaxHeight))
+                    prevMaxHeight = currentMaxHeight
+                }
+            }
+            
+            return result
+        }
+        """,
+        sections: [
+            CodeSection(
+                code: "points.sort { $0.x < $1.x || ($0.x == $1.x && $0.height < $1.height) }",
+                complexity: "O(n log n)",
+                explanation: "Sorting all building points",
+                lineNumbers: "16"
+            ),
+            CodeSection(
+                code: "for point in points { ... }",
+                complexity: "O(n log n)",
+                explanation: "Processing points with height updates",
+                lineNumbers: "21-36"
+            )
+        ],
+        difficulty: .hard,
+        expectedComplexity: "O(n log n)",
+        explanation: "The Skyline algorithm processes buildings by converting them to points, sorting them, and maintaining a height list. The sorting step takes O(n log n), and processing each point involves maintaining a sorted list of heights, giving a total time complexity of O(n log n)."
+    ),
+
+    QuizQuestion(
+        title: "Word Break II",
+        description: "Find all possible sentences that can be formed from a string using a dictionary",
+        codeSnippet: """
+        func wordBreak(_ s: String, _ wordDict: Set<String>) -> [String] {
+            let chars = Array(s)
+            var memo: [Int: [String]] = [:]
+            
+            func backtrack(_ start: Int) -> [String] {
+                if start >= chars.count {
+                    return [""]
+                }
+                
+                if let cached = memo[start] {
+                    return cached
+                }
+                
+                var result: [String] = []
+                
+                for end in (start + 1)...chars.count {
+                    let word = String(chars[start..<end])
+                    if wordDict.contains(word) {
+                        let suffixes = backtrack(end)
+                        for suffix in suffixes {
+                            let space = suffix.isEmpty ? "" : " "
+                            result.append(word + space + suffix)
+                        }
+                    }
+                }
+                
+                memo[start] = result
+                return result
+            }
+            
+            return backtrack(0)
+        }
+        """,
+        sections: [
+            CodeSection(
+                code: "func backtrack(_ start: Int) -> [String]",
+                complexity: "O(2ⁿ)",
+                explanation: "Explores all possible word combinations exponentially",
+                lineNumbers: "5-28"
+            ),
+            CodeSection(
+                code: "for end in (start + 1)...chars.count { ... }",
+                complexity: "O(n)",
+                explanation: "Tries all possible word lengths at each position",
+                lineNumbers: "17-25"
+            )
+        ],
+        difficulty: .hard,
+        expectedComplexity: "O(2ⁿ)",
+        explanation: "Word Break II uses backtracking to find all possible ways to break the string into valid words. At each position, we can either form a word or continue to the next character, creating a binary decision tree. While memoization helps avoid some repeated work, the worst-case time complexity remains O(2ⁿ) due to the exponential number of possible combinations."
     )
 ]

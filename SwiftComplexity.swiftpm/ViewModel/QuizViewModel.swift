@@ -53,14 +53,17 @@ class QuizViewModel: ObservableObject {
     init(difficulty: Difficulty) {
         self.difficulty = difficulty
         
+        let allQuestions: [QuizQuestion]
         switch difficulty {
         case .easy:
-            self.questions = easyQuestions
+            allQuestions = easyQuestions
         case .medium:
-            self.questions = mediumQuestions
+            allQuestions = mediumQuestions
         case .hard:
-            self.questions = hardQuestions
+            allQuestions = hardQuestions
         }
+        
+        self.questions = Array(allQuestions.shuffled().prefix(5))
         
         startTimer()
     }
