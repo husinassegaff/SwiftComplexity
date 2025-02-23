@@ -33,7 +33,7 @@ struct FeedbackView: View {
                 .shadow(radius: 2)
         )
         .padding(.horizontal)
-        .sheet(isPresented: $showDetailedFeedback) {
+        .fullScreenCover(isPresented: $showDetailedFeedback) {
             DetailedFeedbackView(question: question, feedback: feedback)
         }
     }
