@@ -18,7 +18,6 @@ struct MusicControlButton: View {
         .sheet(isPresented: $showingModal) {
             NavigationView {
                 VStack(spacing: 24) {
-                    // Music Control Section
                     VStack(spacing: 16) {
                         Text("Background Music")
                             .font(.title2)
@@ -42,8 +41,7 @@ struct MusicControlButton: View {
                     }
                     
                     Divider()
-                    
-                    // Credits Section
+
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Credits")
                             .font(.title2)

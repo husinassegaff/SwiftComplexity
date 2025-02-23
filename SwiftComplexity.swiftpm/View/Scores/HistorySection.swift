@@ -23,9 +23,16 @@ struct HistorySection: View {
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding()
+                
+                Spacer()
             } else {
-                ForEach(results) { result in
-                    HistoryRow(result: result)
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(results) { result in
+                            HistoryRow(result: result)
+                        }
+                    }
+                    .padding(.vertical, 4)
                 }
             }
         }
