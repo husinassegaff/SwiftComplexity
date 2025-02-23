@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct LearningView: View {
+    @EnvironmentObject private var navigationManager: NavigationManager
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 32) {
@@ -26,7 +28,9 @@ struct LearningView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 16) {
                             ForEach(TimeComplexityTheory) { material in
-                                NavigationLink(destination: TheoryDetailView(material: material)) {
+                                Button {
+                                    navigationManager.navigateTo(.theory(material: material))
+                                } label: {
                                     TheoryCard(material: material)
                                 }
                             }
@@ -45,7 +49,9 @@ struct LearningView: View {
                         GridItem(.adaptive(minimum: 300, maximum: 400), spacing: 16)
                     ], spacing: 16) {
                         ForEach(ComplexityExamples) { example in
-                            NavigationLink(destination: CodeExampleDetailView(example: example)) {
+                            Button {
+                                navigationManager.navigateTo(.codeExample(example: example))
+                            } label: {
                                 ExampleCard(example: example)
                             }
                         }

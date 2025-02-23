@@ -13,17 +13,17 @@ struct TheoryCard: View {
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .lineLimit(3)
+                .multilineTextAlignment(.leading)
             
             Text("Read More")
                 .font(.caption)
                 .bold()
                 .foregroundColor(.blue)
         }
-        .frame(width: 280)
+        .frame(width: 280, alignment: .leading)
         .padding()
         .background(Color(.systemBackground))
         .cornerRadius(12)
         .shadow(radius: 2)
     }
 }
-

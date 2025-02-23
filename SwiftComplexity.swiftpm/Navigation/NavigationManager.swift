@@ -7,6 +7,8 @@ class NavigationManager: ObservableObject {
         case exercise
         case quiz(difficulty: Difficulty)
         case scores
+        case theory(material: LearningMaterial)
+        case codeExample(example: CodeExample)
         
         func hash(into hasher: inout Hasher) {
             switch self {
@@ -19,6 +21,12 @@ class NavigationManager: ObservableObject {
                 hasher.combine(difficulty)
             case .scores:
                 hasher.combine(3)
+            case .theory(let material):
+                     hasher.combine(4)
+                     hasher.combine(material.id)
+            case .codeExample(let example):
+                 hasher.combine(5)
+                 hasher.combine(example.id)
             }
         }
         
@@ -30,8 +38,12 @@ class NavigationManager: ObservableObject {
                 return true
             case (.quiz(let lDifficulty), .quiz(let rDifficulty)):
                 return lDifficulty == rDifficulty
+            case (.theory(let lMaterial), .theory(let rMaterial)):
+                return lMaterial.id == rMaterial.id
+            case (.codeExample(let lExample), .codeExample(let rExample)):
+               return lExample.id == rExample.id
             default:
-                return false
+               return false
             }
         }
     }
@@ -78,6 +90,10 @@ class NavigationManager: ObservableObject {
             QuizView(difficulty: difficulty)
         case .scores:
             ScoresView()
+        case .theory(let material):
+            TheoryDetailView(material: material)
+        case .codeExample(let example):
+            CodeExampleDetailView(example: example)
         }
     }
     

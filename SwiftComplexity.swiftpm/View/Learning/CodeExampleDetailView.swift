@@ -44,12 +44,12 @@ struct CodeExampleDetailView: View {
                         }
                     } else {
                         VStack(alignment: .leading, spacing: 16) {
-                            Text("Time Complexity Analysis")
-                                .font(.headline)
-                                .padding(.top)
-                            
+                
                             Text(example.explanation)
                                 .padding(.bottom)
+                                .padding(.horizontal)
+                                .multilineTextAlignment(.leading)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .transition(.opacity)
                         }
                     }

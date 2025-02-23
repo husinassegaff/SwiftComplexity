@@ -24,6 +24,7 @@ struct ExampleCard: View {
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .lineLimit(2)
+                .multilineTextAlignment(.leading)
             
             Text("View Example")
                 .font(.caption)
@@ -31,9 +32,11 @@ struct ExampleCard: View {
                 .foregroundColor(.blue)
         }
         .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.systemBackground))
         .cornerRadius(12)
         .shadow(radius: 2)
     }
 }
+
 
