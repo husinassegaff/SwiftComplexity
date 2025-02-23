@@ -11,9 +11,12 @@ class QuizViewModel: ObservableObject {
     @Published var feedback: FeedbackState?
     @Published var elapsedTime: TimeInterval = 0
     @Published var showHint = false
+    @Published var showTimePenalty = false
+    @Published var timePenaltyAmount: Double = 0
     
     private var timerCancellable: AnyCancellable?
     private var startTime: Date?
+    private var totalPenaltyTime: TimeInterval = 0
     private let difficulty: Difficulty
     private var questions: [QuizQuestion]
     private var answeredCorrectly: Set<Int> = []
@@ -69,7 +72,7 @@ class QuizViewModel: ObservableObject {
             .sink { [weak self] _ in
                 guard let self = self,
                       let startTime = self.startTime else { return }
-                self.elapsedTime = Date().timeIntervalSince(startTime)
+                self.elapsedTime = Date().timeIntervalSince(startTime) + self.totalPenaltyTime
             }
     }
     
@@ -130,6 +133,7 @@ class QuizViewModel: ObservableObject {
             showHint = false
             stopTimer()
             elapsedTime = 0
+            totalPenaltyTime = 0
             startTimer()
         }
     }
@@ -146,13 +150,26 @@ class QuizViewModel: ObservableObject {
         if showHint && !hintUsedForQuestions.contains(currentQuestionIndex) {
             hintUsedForQuestions.insert(currentQuestionIndex)
             
+            let penalty: Double
             switch difficulty {
             case .easy:
-                elapsedTime += 10
+                penalty = 10
             case .medium:
-                elapsedTime += 15
+                penalty = 15
             case .hard:
-                elapsedTime += 25
+                penalty = 25
+            }
+
+            totalPenaltyTime += penalty
+            timePenaltyAmount = penalty
+            
+            showTimePenalty = true
+            
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                withAnimation {
+                    self.showTimePenalty = false
+                }
             }
         }
     }

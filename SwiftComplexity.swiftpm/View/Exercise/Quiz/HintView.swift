@@ -33,7 +33,6 @@ struct HintView: View {
                 )
             }
         }
-        .padding()
         .background(Color(.systemBackground))
         .cornerRadius(12)
     }

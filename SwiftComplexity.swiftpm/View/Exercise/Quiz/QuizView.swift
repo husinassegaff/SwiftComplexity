@@ -16,10 +16,23 @@ struct QuizView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            Text(viewModel.formattedTime)
-                .font(.system(.title3, design: .monospaced))
-                .foregroundColor(.secondary)
-                .padding(.vertical, 8)
+            HStack {
+                 Text(viewModel.formattedTime)
+                     .font(.system(.title3, design: .monospaced))
+                     .foregroundColor(.secondary)
+                 
+                 if viewModel.showTimePenalty {
+                     Text("+\(Int(viewModel.timePenaltyAmount))s")
+                         .font(.system(.title3, design: .monospaced))
+                         .foregroundColor(.orange)
+                         .transition(.asymmetric(
+                             insertion: .scale.combined(with: .opacity),
+                             removal: .opacity
+                         ))
+                 }
+             }
+             .padding(.vertical, 8)
+             .animation(.easeInOut, value: viewModel.showTimePenalty)
             
             ProgressView(value: viewModel.progress)
                 .tint(difficultyColor)
@@ -62,7 +75,8 @@ struct QuizView: View {
                 Button {
                     viewModel.toggleHint()
                 } label: {
-                    Label("Hint", systemImage: "lightbulb")
+                    Label(viewModel.showHint ? "Close Hint" : "Open Hint",
+                          systemImage: viewModel.showHint ? "lightbulb.fill" : "lightbulb")
                         .padding()
                         .background(Color.yellow.opacity(0.2))
                         .foregroundColor(.orange)
@@ -70,15 +84,17 @@ struct QuizView: View {
                 }
             }
             .padding(.horizontal)
+            .padding(.bottom)
             
-            if viewModel.showHint {
-                HintView(sections: viewModel.currentQuestion.sections)
-                    .padding()
-                    .transition(.move(edge: .top).combined(with: .opacity))
-            }
             
             ScrollView {
                 VStack(spacing: 20) {
+                    if viewModel.showHint {
+                        HintView(sections: viewModel.currentQuestion.sections)
+                            .padding()
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+                    
                     QuestionHeaderView(question: viewModel.currentQuestion)
                     
                     HStack(spacing: 20) {
