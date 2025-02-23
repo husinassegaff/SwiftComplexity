@@ -5,6 +5,7 @@ import SwiftData
 struct MyApp: App {
     @StateObject private var navigationManager = NavigationManager()
     @StateObject private var audioManager = AudioManager.shared
+    @Environment(\.scenePhase) private var scenePhase
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -26,6 +27,18 @@ struct MyApp: App {
                 .onAppear {
                     audioManager.playMusic()
                 }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            switch newPhase {
+            case .active:
+                if audioManager.isPlaying {
+                    audioManager.playMusic()
+                }
+            case .inactive, .background:
+                audioManager.stopMusic()
+            @unknown default:
+                break
+            }
         }
     }
 }
