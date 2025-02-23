@@ -4,6 +4,7 @@ import SwiftData
 @main
 struct MyApp: App {
     @StateObject private var navigationManager = NavigationManager()
+    @StateObject private var audioManager = AudioManager.shared
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -22,6 +23,9 @@ struct MyApp: App {
         WindowGroup {
             ContentView()
                 .modelContainer(sharedModelContainer)
+                .onAppear {
+                    audioManager.playMusic()
+                }
         }
     }
 }

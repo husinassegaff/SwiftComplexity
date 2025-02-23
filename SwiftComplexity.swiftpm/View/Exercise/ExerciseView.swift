@@ -96,5 +96,10 @@ struct ExerciseView: View {
             .padding()
         }
         .navigationTitle("Exercise")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                MusicControlButton()
+            }
+        }
     }
 }

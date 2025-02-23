@@ -20,10 +20,10 @@ let package = Package(
             teamIdentifier: "3LJ8H4VC37",
             displayVersion: "1.0",
             bundleVersion: "1",
-            appIcon: .placeholder(icon: .cloud),
+            appIcon: .placeholder(icon: .tv),
             accentColor: .presetColor(.purple),
             supportedDeviceFamilies: [
-                .pad,
+                .pad
             ],
             supportedInterfaceOrientations: [
                 .landscapeRight,

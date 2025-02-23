@@ -82,6 +82,12 @@ struct QuizView: View {
                         .foregroundColor(.orange)
                         .cornerRadius(10)
                 }
+                
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        MusicControlButton()
+                    }
+                }
             }
             .padding(.horizontal)
             .padding(.bottom)

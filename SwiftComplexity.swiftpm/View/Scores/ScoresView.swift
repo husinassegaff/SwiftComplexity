@@ -21,6 +21,11 @@ struct ScoresView: View {
         }
         .padding()
         .navigationTitle("Quiz Scores")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                MusicControlButton()
+            }
+        }
         .onAppear {
             viewModel.setContext(context: context)
             viewModel.fetchResults()

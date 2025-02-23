@@ -62,5 +62,10 @@ struct LearningView: View {
             .padding(.bottom, 32)
         }
         .navigationTitle("Learn")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                MusicControlButton()
+            }
+        }
     }
 }
