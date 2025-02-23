@@ -3,7 +3,9 @@ import SwiftUI
 struct QuizView: View {
     let difficulty: Difficulty
     @StateObject private var viewModel: QuizViewModel
+    @StateObject private var resultViewModel = QuizResultViewModel()
     @EnvironmentObject private var navigationManager: NavigationManager
+    @Environment(\.modelContext) private var context
     @State private var showExitAlert = false
     @State private var showQuizResult = false
     
@@ -39,19 +41,17 @@ struct QuizView: View {
                         .cornerRadius(10)
                     }
                     
-                    Button(action: {
-                        navigationManager.navigateBack()
-                    }) {
-                        HStack {
-                            Image(systemName: "square.and.arrow.down")
-                            Text("Save & Exit")
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                    }
+                    Button(action: saveAndExit) {
+                       HStack {
+                           Image(systemName: "square.and.arrow.down")
+                           Text("Save & Exit")
+                       }
+                       .frame(maxWidth: .infinity)
+                       .padding()
+                       .background(Color.green)
+                       .foregroundColor(.white)
+                       .cornerRadius(10)
+                   }
                 }
                 .padding()
             }
@@ -108,6 +108,9 @@ struct QuizView: View {
         .sheet(isPresented: $viewModel.showResult) {
             QuizResultView(viewModel: viewModel)
         }
+        .onAppear {
+            resultViewModel.setContext(context: context)
+        }
     }
     
     private var difficultyColor: Color {
@@ -116,5 +119,16 @@ struct QuizView: View {
         case .medium: return .orange
         case .hard: return .red
         }
+    }
+    
+    private func saveAndExit() {
+        resultViewModel.saveQuizResult(
+            score: viewModel.score,
+            totalQuestions: viewModel.questionCount,
+            difficulty: difficulty,
+            completionTime: viewModel.elapsedTime
+        )
+        
+        navigationManager.navigateBack()
     }
 }

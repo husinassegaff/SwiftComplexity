@@ -9,7 +9,6 @@ struct DetailedFeedbackView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    // Status header
                     HStack {
                         Image(systemName: feedback.isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
                             .foregroundColor(feedback.isCorrect ? .green : .red)
@@ -27,7 +26,6 @@ struct DetailedFeedbackView: View {
                     .background(Color(.systemGray6))
                     .cornerRadius(12)
                     
-                    // Code analysis section
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Code Analysis")
                             .font(.title2)
@@ -62,7 +60,6 @@ struct DetailedFeedbackView: View {
                         }
                     }
                     
-                    // Overall explanation
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Overall Analysis")
                             .font(.title2)

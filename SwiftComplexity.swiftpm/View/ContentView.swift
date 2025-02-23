@@ -37,6 +37,21 @@ struct ContentView: View {
                 Label("Exercise", systemImage: "pencil.circle.fill")
             }
             .tag(1)
+            
+            NavigationStack(path: Binding(
+                get: { navigationManager.scoresPath },
+                set: { navigationManager.setPath($0) }
+            )) {
+                ScoresView()
+                    .environmentObject(navigationManager)
+                    .navigationDestination(for: NavigationManager.Route.self) { route in
+                        navigationManager.view(for: route)
+                    }
+            }
+            .tabItem {
+                Label("Scores", systemImage: "chart.bar.fill")
+            }
+            .tag(2)
         }
         .environmentObject(navigationManager)
     }

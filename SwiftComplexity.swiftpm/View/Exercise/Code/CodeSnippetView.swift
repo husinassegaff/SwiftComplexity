@@ -15,19 +15,17 @@ struct CodeSnippetView: View {
             VStack(spacing: 0) {
                 ForEach(splitIntoLines(), id: \.number) { line in
                     HStack(spacing: 0) {
-                        // Line number
                         Text("\(line.number)")
                             .font(.system(.caption, design: .monospaced))
                             .foregroundColor(.secondary)
                             .frame(width: 40, alignment: .trailing)
                             .padding(.horizontal, 8)
                         
-                        // Line separator
                         Rectangle()
                             .fill(Color(.systemGray4))
                             .frame(width: 1)
                         
-                        // Code content
+
                         Text(line.code)
                             .font(.system(.body, design: .monospaced))
                             .frame(maxWidth: .infinity, alignment: .leading)
