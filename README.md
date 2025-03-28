@@ -81,3 +81,7 @@ SwiftComplexity/
 1. Clone the repository
 2. Open the project in Xcode
 3. Build and run on an iPad device or simulator
+
+## License
+This project is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/).  
+You may use, adapt, and share it for non-commercial purposes with proper attribution.
